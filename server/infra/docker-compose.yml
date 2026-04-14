@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  n8n:
+    image: n8nio/n8n
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=${N8N_HOST:-0.0.0.0}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - DB_TYPE=mysqldb
+      - DB_MYSQLDB_HOST=${DB_MYSQLDB_HOST}
+      - DB_MYSQLDB_PORT=${DB_MYSQLDB_PORT:-3306}
+      - DB_MYSQLDB_DATABASE=${DB_MYSQLDB_DATABASE:-jarvis}
+      - DB_MYSQLDB_USER=${DB_MYSQLDB_USER:-admin}
+      - DB_MYSQLDB_PASSWORD=${DB_MYSQLDB_PASSWORD}
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
