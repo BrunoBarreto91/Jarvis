@@ -37,7 +37,7 @@ graph LR
     end
 
     subgraph "Flow 3 — Notification Intelligence"
-        C1["Schedule (hourly)"] --> C2["Query pending tasks"]
+        C1["Configurable schedule"] --> C2["Query pending tasks"]
         C2 --> C3["Guardian Agent (Gemini Flash)"]
         C3 --> C4["Interrupt or Silence"]
     end

@@ -4,7 +4,7 @@ The Guardian Agent is the most distinctive feature of Jarvis. It is not a timer 
 
 ## How It Works
 
-Every hour, the Guardian Agent:
+On a configurable schedule, the Guardian Agent:
 
 1. Queries all pending tasks from MySQL
 2. Aggregates them into a single payload

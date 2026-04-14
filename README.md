@@ -8,7 +8,7 @@
 
 ## The Problem
 
-Traditional productivity tools assume users can consistently organize, prioritize, and execute. In practice, many people face **cognitive overload, decision paralysis, and difficulty with time management**. Tools like Todoist, Trello, and Notion require manual organization that consumes the energy that should go toward execution.
+Traditional productivity tools assume users can consistently organize, prioritize, and execute. In practice, many professionals face **cognitive overload, decision paralysis, and difficulty managing time effectively**. Tools like Todoist, Trello, and Notion require manual organization that consumes the energy that should go toward execution.
 
 ## The Solution
 
@@ -42,7 +42,7 @@ The system operates with **3 independent flows** within a single n8n workflow:
 |------|---------|----------|----------|
 | **Task Creation** | `POST /tasks` (webhook) | Gemini Flash Lite | Parses natural language → 8 structured fields → MySQL |
 | **Task Update** | `PATCH /tasks` (webhook) | — | Updates status + collects cognitive cost, sentiment, real duration |
-| **Notification Intelligence** | Schedule (hourly) | Gemini Flash | Analyzes all pending tasks, decides: interrupt or silence |
+| **Notification Intelligence** | Configurable schedule | Gemini Flash | Analyzes all pending tasks, decides: interrupt or silence |
 
 ### Task Creation Flow
 
@@ -63,7 +63,7 @@ POST /tasks → Auth Validator (Cognito JWT) → Jarvis Agent (Gemini Flash Lite
 
 ### Notification Intelligence (Guardian Agent)
 
-The most distinctive feature. Every hour, the Guardian Agent:
+The most distinctive feature. On a configurable schedule, the Guardian Agent:
 
 1. Queries all pending tasks from MySQL
 2. Aggregates them into a single payload
