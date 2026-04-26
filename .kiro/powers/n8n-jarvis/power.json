@@ -1,0 +1,18 @@
+{
+  "name": "n8n-jarvis",
+  "description": "Conventions and reference for the 3 n8n flows of Jarvis 2.0 (ingestion, classification, guardian).",
+  "version": "1.0.0",
+  "activation": {
+    "type": "fileMatch",
+    "patterns": ["workflow/**", "server/n8n/**", "**/n8n-*.md"]
+  },
+  "steering": [
+    "steering/n8n-conventions.md",
+    "steering/flow-ingestion.md",
+    "steering/flow-classification.md",
+    "steering/flow-guardian.md"
+  ],
+  "references": [
+    "reference/jarvis_workflow.json"
+  ]
+}

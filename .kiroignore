@@ -1,0 +1,12 @@
+# Bloqueios — nunca enviar ao modelo
+.env
+.env.*
+*.pem
+*.key
+sql/seed_*.sql
+workflow/*.json
+secrets/**
+
+# Exceções (re-permitir) — note o "!"
+!sql/schema.sql
+!workflow/example.json
