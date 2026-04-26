@@ -1,6 +1,6 @@
 # Jarvis — Cognitive Task Infrastructure
 
-> A personal cognitive infrastructure that receives thoughts in natural language and returns structure, focus, and action — without manual configuration, interface learning, or bureaucracy.
+> A cognitive task infrastructure that receives thoughts in natural language and returns structure, focus, and action — without manual configuration, interface learning, or bureaucracy.
 
 ![Status](https://img.shields.io/badge/status-backend%20functional-green)
 ![Stack](https://img.shields.io/badge/stack-n8n%20%7C%20Gemini%20%7C%20MySQL%20%7C%20AWS-blue)
@@ -53,13 +53,13 @@ POST /tasks → Auth Validator (Cognito JWT) → Jarvis Agent (Gemini Flash Lite
 
 **Auto-generated fields:**
 - `title` — extracted from natural language
-- `contexto` — Work / Home / Health / Personal
+- `context` — Work / Home / Health / Personal
 - `tag` — Deep Focus / Urgent / Social / Creative
-- `categoria` — Task / Idea / Habit
-- `prioridade` — low / medium / high
-- `nivel_energia` — low / medium / high
-- `duracao_estimada_minutos` — integer
-- `notas` — details + user commands
+- `category` — Task / Idea / Habit
+- `priority` — low / medium / high
+- `energy_level` — low / medium / high
+- `estimated_duration_minutes` — integer
+- `notes` — details + user commands
 
 ### Notification Intelligence (Guardian Agent)
 
@@ -76,7 +76,7 @@ Decision criteria:
 - **Temporal context** — late night / weekend = 10x more selective
 - **Notes field is SUPREME** — commands like "Don't notify" override everything
 
-Output: `{ decisao, motivo, mensagem }` (empathic message)
+Output: `{ decision, reason, message }` (empathic message)
 
 ## Tech Stack
 
@@ -108,17 +108,17 @@ CREATE TABLE tasks (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   userId          VARCHAR(255) NOT NULL,
   title           VARCHAR(255) NOT NULL,
-  frente          ENUM('trabalho','pessoal','saude','estudo') NOT NULL,
-  tipo            ENUM('foco_profundo','manutencao_vital','rotina','urgente') NOT NULL,
+  context         ENUM('work','personal','health','study') NOT NULL,
+  type            ENUM('deep_focus','vital_maintenance','routine','urgent') NOT NULL,
   status          ENUM('todo','doing','blocked','done') DEFAULT 'todo' NOT NULL,
-  prazo           TIMESTAMP NULL,
-  prioridade      ENUM('baixa','media','alta') DEFAULT 'media' NOT NULL,
-  esforco         ENUM('baixo','medio','alto') DEFAULT 'medio' NOT NULL,
-  bloqueador      TEXT,
-  notas           TEXT,
-  criadoEm        TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  completadoEm    TIMESTAMP NULL,
-  atualizadoEm    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
+  deadline        TIMESTAMP NULL,
+  priority        ENUM('low','medium','high') DEFAULT 'medium' NOT NULL,
+  effort          ENUM('low','medium','high') DEFAULT 'medium' NOT NULL,
+  blocker         TEXT,
+  notes           TEXT,
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  completed_at    TIMESTAMP NULL,
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL
 );
 ```
 
@@ -157,16 +157,14 @@ Over time, this builds a **self-knowledge layer** that no task manager offers.
 
 1. **Onboarding Interview** — guided interview on signup so the agent knows the user's goals, routine, and preferences
 2. **Focus Queue** — show only the next logical task
-3. **Zen Mode** — reduced interface
-4. **Cognitive load alerts** — suggest breaks, rescheduling
-5. **Self-knowledge dashboard** — real vs. estimated cognitive cost over time
+3. **Self-knowledge dashboard** — real vs. estimated cognitive cost over time
 
 ## Repository Structure
 
 ```
 Jarvis/
-├── server/              # Backend (Express + tRPC)
-│   ├── _core/           # Server entry point + NLP task parser
+├── server/              # n8n integration layer + NLP task parser
+│   ├── _core/           # Server entry point + task parser utilities
 │   └── infra/           # Docker Compose + EC2 setup scripts
 ├── client/              # Frontend (React + Vite + Tailwind)
 │   └── src/
@@ -174,7 +172,7 @@ Jarvis/
 │       ├── components/  # TaskForm, FocusQueue, ErrorBoundary
 │       ├── pages/       # ZenMode, Kanban, Tasks, Settings
 │       └── lib/         # API client
-├── drizzle/             # Database schema + migrations
+├── drizzle/             # Schema definitions + migration files
 ├── docs/                # Architecture, Guardian Agent, API reference
 ├── workflow/            # n8n workflow exports (JSON)
 ├── assets/              # Architecture diagrams (HLD/MLD/LLD)
