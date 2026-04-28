@@ -1,24 +1,38 @@
-import { useLocation, Redirect } from "wouter";
-import { useAuthContext } from "@/_core/context/AuthContext";
-import type { ReactNode } from "react";
+import { useEffect, useState, ReactNode } from "react";
+import { Navigate } from "react-router-dom";
+import { fetchAuthSession } from "aws-amplify/auth";
+import { Loader2 } from "lucide-react";
+
+type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
 interface ProtectedRouteProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
-/**
- * Wraps any route that requires an authenticated session.
- * - Redirects to /login when the user is not authenticated.
- * - Preserves the intended destination in the URL so we can
- *   redirect back after a successful login (future enhancement).
- */
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-    const { isAuthenticated } = useAuthContext();
-    const [location] = useLocation();
+  const [status, setStatus] = useState<AuthStatus>("loading");
 
-    if (!isAuthenticated) {
-        return <Redirect to={`/login?redirect=${encodeURIComponent(location)}`} />;
-    }
+  useEffect(() => {
+    fetchAuthSession()
+      .then((session) => {
+        setStatus(session.tokens ? "authenticated" : "unauthenticated");
+      })
+      .catch(() => {
+        setStatus("unauthenticated");
+      });
+  }, []);
 
-    return <>{children}</>;
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <Loader2 className="h-8 w-8 animate-spin text-violet-400" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 }

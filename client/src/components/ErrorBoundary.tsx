@@ -13,12 +13,10 @@ interface State {
 }
 
 /**
- * ErrorBoundary - Jarvis 2.0 Resiliency Layer
- * 
- * Conforme SSOT - Protocolo de Estabilidade:
- * - Isola falhas em componentes individuais
- * - Mantém sidebar e layout funcionais mesmo se conteúdo crashar
- * - Exibe mensagem TDAH-friendly (baixa carga cognitiva)
+ * ErrorBoundary — Jarvis Resiliency Layer
+ *
+ * Isolates failures in individual components so the sidebar and layout
+ * remain functional even if page content crashes.
  */
 export class ErrorBoundary extends Component<Props, State> {
     public state: State = {
@@ -59,7 +57,7 @@ export class ErrorBoundary extends Component<Props, State> {
                             >
                                 Recarregar Página
                             </Button>
-                            {process.env.NODE_ENV === 'development' && this.state.error && (
+                        {import.meta.env.DEV && this.state.error && (
                                 <details className="text-xs text-slate-500 mt-4">
                                     <summary className="cursor-pointer font-mono">
                                         Detalhes técnicos (desenvolvimento)

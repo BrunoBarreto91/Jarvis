@@ -36,7 +36,7 @@ export function FocusQueue({ refreshTrigger }: { refreshTrigger?: number }) {
             await api.updateTask(id, { status: 'done' });
             toast.success("Tarefa concluída!");
             loadTasks();
-        } catch (e) {
+        } catch {
             toast.error("Erro ao concluir tarefa.");
         }
     };
@@ -46,7 +46,7 @@ export function FocusQueue({ refreshTrigger }: { refreshTrigger?: number }) {
             await api.updateTask(id, { status: 'blocked' });
             toast.warning("Tarefa bloqueada.");
             loadTasks();
-        } catch (e) {
+        } catch {
             toast.error("Erro ao bloquear tarefa.");
         }
     };

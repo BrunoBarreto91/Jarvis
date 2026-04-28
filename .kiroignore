@@ -6,6 +6,7 @@
 sql/seed_*.sql
 workflow/*.json
 secrets/**
+.kiro/settings/mcp.json
 
 # Exceções (re-permitir) — note o "!"
 !sql/schema.sql
