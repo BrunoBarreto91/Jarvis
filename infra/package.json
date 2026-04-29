@@ -1,0 +1,22 @@
+{
+  "name": "jarvis-infra",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "deploy": "cdk deploy",
+    "import": "cdk import"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.251.0",
+    "constructs": "10.6.0",
+    "source-map-support": "0.5.21"
+  },
+  "devDependencies": {
+    "aws-cdk": "2.1120.0",
+    "ts-node": "10.9.2",
+    "typescript": "5.8.3"
+  }
+}
