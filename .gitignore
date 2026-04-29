@@ -16,6 +16,10 @@ build/
 *.pem
 secrets/
 
+# Infra docs with credentials (never expose)
+docs/infra-blueprint.md
+docs/infra-spec.md
+
 # Kiro
 .kiro/cache/
 .kiro/settings/mcp.json
@@ -54,3 +58,5 @@ coverage/
 # Misc
 *.bak
 *.tmp
+
+infra/scan-baseline/

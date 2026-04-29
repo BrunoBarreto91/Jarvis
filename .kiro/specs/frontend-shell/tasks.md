@@ -89,4 +89,4 @@ Tasks are ordered for sequential execution. Each task builds on the previous. Co
   - [x] 12.1 Run `npm run --prefix client typecheck` — expect zero TypeScript errors
   - [x] 12.2 Run `npm run --prefix client lint` — expect zero ESLint errors and zero warnings
   - [x] 12.3 Run `npm run --prefix client test` — expect all tests pass
-  - [ ] 12.4 Run `npm run --prefix client dev` manually in a terminal and verify the app loads at `http://localhost:5173`, the `/login` route renders the Amplify Authenticator, and navigating to `/dashboard` without auth redirects to `/login`
+  - [x] 12.4 Run `npm run --prefix client dev` manually in a terminal and verify the app loads at `http://localhost:5173`, the `/login` route renders the Amplify Authenticator, and navigating to `/dashboard` without auth redirects to `/login`
