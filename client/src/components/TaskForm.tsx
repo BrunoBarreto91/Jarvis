@@ -46,7 +46,7 @@ export function TaskForm({ onTaskCreated }: { onTaskCreated?: () => void }) {
           <Textarea
             placeholder="Ex: Preciso revisar o orçamento da AWS amanhã cedo..."
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
             className="min-h-[120px] text-base resize-none focus-visible:ring-1 focus-visible:ring-slate-400"
             disabled={isLoading}
           />

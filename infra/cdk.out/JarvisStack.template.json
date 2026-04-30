@@ -1,0 +1,524 @@
+{
+ "Description": "Jarvis infrastructure — EC2 n8n, RDS MySQL, Cognito, Amplify",
+ "Resources": {
+  "JarvisN8nSg09D48FB2": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Security Group for Jarvis n8n server",
+    "GroupName": "jarvis-n8n-sg",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "SSH",
+      "FromPort": 22,
+      "IpProtocol": "tcp",
+      "ToPort": 22
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "HTTP",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "n8n",
+      "FromPort": 5678,
+      "IpProtocol": "tcp",
+      "ToPort": 5678
+     }
+    ],
+    "VpcId": "vpc-0312957e4ffc83c1c"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisN8nSg/Resource"
+   }
+  },
+  "JarvisRdsSg7C281A02": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Security Group for Jarvis RDS MySQL - EC2 access only",
+    "GroupName": "jarvis-rds-sg",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": "vpc-0312957e4ffc83c1c"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisRdsSg/Resource"
+   }
+  },
+  "JarvisRdsSgfromJarvisStackJarvisN8nSg2D0519393306B0610907": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "MySQL from n8n SG",
+    "FromPort": 3306,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "JarvisRdsSg7C281A02",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "JarvisN8nSg09D48FB2",
+      "GroupId"
+     ]
+    },
+    "ToPort": 3306
+   },
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisRdsSg/from JarvisStackJarvisN8nSg2D051939:3306"
+   }
+  },
+  "JarvisN8nServerInstanceRoleC3F5FEA7": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ec2.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "jarvis-n8n-server"
+     },
+     {
+      "Key": "Project",
+      "Value": "Jarvis"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisN8nServer/InstanceRole/Resource"
+   }
+  },
+  "JarvisN8nServerInstanceProfile942886F1": {
+   "Type": "AWS::IAM::InstanceProfile",
+   "Properties": {
+    "Roles": [
+     {
+      "Ref": "JarvisN8nServerInstanceRoleC3F5FEA7"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisN8nServer/InstanceProfile"
+   }
+  },
+  "JarvisN8nServerA7593D1D": {
+   "Type": "AWS::EC2::Instance",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "BlockDeviceMappings": [
+     {
+      "DeviceName": "/dev/xvda",
+      "Ebs": {
+       "DeleteOnTermination": true,
+       "Encrypted": false,
+       "Iops": 3000,
+       "VolumeSize": 30,
+       "VolumeType": "gp3"
+      }
+     }
+    ],
+    "IamInstanceProfile": {
+     "Ref": "JarvisN8nServerInstanceProfile942886F1"
+    },
+    "ImageId": "ami-0c1e21d82fe9c9336",
+    "InstanceType": "t3.micro",
+    "KeyName": "jarvis-key",
+    "LaunchTemplate": {
+     "LaunchTemplateName": "JarvisN8nServerLaunchTemplate",
+     "Version": {
+      "Fn::GetAtt": [
+       "JarvisN8nServerLaunchTemplateE9BDA2B7",
+       "LatestVersionNumber"
+      ]
+     }
+    },
+    "MetadataOptions": {
+     "HttpPutResponseHopLimit": 2
+    },
+    "PropagateTagsToVolumeOnCreation": false,
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "JarvisN8nSg09D48FB2",
+       "GroupId"
+      ]
+     }
+    ],
+    "SubnetId": "subnet-0fc0ba1fc079f68c3",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "jarvis-n8n-server"
+     },
+     {
+      "Key": "Project",
+      "Value": "Jarvis"
+     }
+    ],
+    "UserData": {
+     "Fn::Base64": "#!/bin/bash"
+    }
+   },
+   "DependsOn": [
+    "JarvisN8nServerInstanceRoleC3F5FEA7"
+   ],
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisN8nServer/Resource"
+   }
+  },
+  "JarvisN8nServerLaunchTemplateE9BDA2B7": {
+   "Type": "AWS::EC2::LaunchTemplate",
+   "Properties": {
+    "LaunchTemplateData": {
+     "MetadataOptions": {
+      "HttpTokens": "required"
+     }
+    },
+    "LaunchTemplateName": "JarvisN8nServerLaunchTemplate"
+   },
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisN8nServer/LaunchTemplate"
+   }
+  },
+  "JarvisRdsSecret": {
+   "Type": "AWS::SecretsManager::Secret",
+   "Properties": {
+    "Description": "Jarvis RDS master credentials",
+    "Name": "jarvis/rds/master-password"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisRdsSecret"
+   }
+  },
+  "JarvisRdsSecretRefAttachment4416A3DF": {
+   "Type": "AWS::SecretsManager::SecretTargetAttachment",
+   "Properties": {
+    "SecretId": {
+     "Fn::GetAtt": [
+      "JarvisRdsSecret",
+      "Id"
+     ]
+    },
+    "TargetId": {
+     "Ref": "JarvisDbD9CA4EED"
+    },
+    "TargetType": "AWS::RDS::DBInstance"
+   },
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisRdsSecretRef/Attachment/Resource"
+   }
+  },
+  "JarvisDbD9CA4EED": {
+   "Type": "AWS::RDS::DBInstance",
+   "Properties": {
+    "AllocatedStorage": "20",
+    "AutoMinorVersionUpgrade": true,
+    "BackupRetentionPeriod": 0,
+    "CopyTagsToSnapshot": true,
+    "DBInstanceClass": "db.t3.micro",
+    "DBInstanceIdentifier": "jarvis-db",
+    "DBName": "jarvis_db",
+    "DBSubnetGroupName": "jarvis-db-subnet-group",
+    "DeletionProtection": false,
+    "Engine": "mysql",
+    "EngineVersion": "8.0.45",
+    "MasterUserPassword": {
+     "Fn::Join": [
+      "",
+      [
+       "{{resolve:secretsmanager:",
+       {
+        "Fn::GetAtt": [
+         "JarvisRdsSecret",
+         "Id"
+        ]
+       },
+       ":SecretString:password::}}"
+      ]
+     ]
+    },
+    "MasterUsername": "admin",
+    "MultiAZ": false,
+    "PubliclyAccessible": false,
+    "StorageEncrypted": false,
+    "StorageType": "gp2",
+    "Tags": [
+     {
+      "Key": "Project",
+      "Value": "Jarvis"
+     }
+    ],
+    "VPCSecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "JarvisRdsSg7C281A02",
+       "GroupId"
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisDb/Resource"
+   }
+  },
+  "JarvisUserPool45CBB6EE": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_email",
+       "Priority": 1
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "MfaConfiguration": "OFF",
+    "Policies": {
+     "PasswordPolicy": {
+      "MinimumLength": 8,
+      "RequireLowercase": true,
+      "RequireNumbers": true,
+      "RequireSymbols": true,
+      "RequireUppercase": true
+     }
+    },
+    "Schema": [
+     {
+      "Mutable": true,
+      "Name": "email",
+      "Required": true
+     }
+    ],
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "jarvis-user-pool",
+    "UsernameAttributes": [
+     "email"
+    ],
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisUserPool/Resource"
+   }
+  },
+  "JarvisUserPoolClient03B4E668": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AccessTokenValidity": 60,
+    "AllowedOAuthFlows": [
+     "implicit",
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "profile",
+     "phone",
+     "email",
+     "openid",
+     "aws.cognito.signin.user.admin"
+    ],
+    "CallbackURLs": [
+     "https://example.com"
+    ],
+    "ClientName": "jarvis-web-client",
+    "ExplicitAuthFlows": [
+     "ALLOW_USER_SRP_AUTH",
+     "ALLOW_REFRESH_TOKEN_AUTH"
+    ],
+    "GenerateSecret": false,
+    "IdTokenValidity": 60,
+    "PreventUserExistenceErrors": "ENABLED",
+    "RefreshTokenValidity": 43200,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "TokenValidityUnits": {
+     "AccessToken": "minutes",
+     "IdToken": "minutes",
+     "RefreshToken": "minutes"
+    },
+    "UserPoolId": {
+     "Ref": "JarvisUserPool45CBB6EE"
+    },
+    "WriteAttributes": [
+     "email",
+     "name"
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisUserPoolClient/Resource"
+   }
+  },
+  "JarvisAmplifyApp": {
+   "Type": "AWS::Amplify::App",
+   "Properties": {
+    "BasicAuthConfig": {
+     "EnableBasicAuth": false
+    },
+    "BuildSpec": "version: 1\nfrontend:\n  phases:\n    preBuild:\n      commands:\n        - corepack enable\n        - corepack prepare pnpm@latest --activate\n        - pnpm install --frozen-lockfile\n    build:\n      commands:\n        - pnpm run build\n  artifacts:\n    baseDirectory: dist\n    files:\n      - '**/*'\n  cache:\n    paths:\n      - node_modules/**/*",
+    "CacheConfig": {
+     "Type": "AMPLIFY_MANAGED_NO_COOKIES"
+    },
+    "EnableBranchAutoDeletion": false,
+    "Name": "Jarvis",
+    "Platform": "WEB"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/JarvisAmplifyApp"
+   }
+  },
+  "PortfolioAmplifyApp": {
+   "Type": "AWS::Amplify::App",
+   "Properties": {
+    "BasicAuthConfig": {
+     "EnableBasicAuth": false
+    },
+    "BuildSpec": "version: 1\nfrontend:\n  phases:\n    build:\n      commands: []\n  artifacts:\n    baseDirectory: /\n    files:\n      - '**/*'\n  cache:\n    paths: []",
+    "CacheConfig": {
+     "Type": "AMPLIFY_MANAGED_NO_COOKIES"
+    },
+    "CustomRules": [
+     {
+      "Source": "/<*>",
+      "Status": "404-200",
+      "Target": "/index.html"
+     }
+    ],
+    "EnableBranchAutoDeletion": false,
+    "IAMServiceRole": "arn:aws:iam::733048624030:role/amplifyconsole-backend-role",
+    "Name": "Bruno_Barreto-portfolio",
+    "Platform": "WEB",
+    "Repository": "https://github.com/brunobarreto91/pentecost-site"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/PortfolioAmplifyApp"
+   }
+  },
+  "PortfolioAmplifyMainBranch": {
+   "Type": "AWS::Amplify::Branch",
+   "Properties": {
+    "AppId": {
+     "Fn::GetAtt": [
+      "PortfolioAmplifyApp",
+      "AppId"
+     ]
+    },
+    "BranchName": "main",
+    "EnableAutoBuild": true,
+    "EnablePerformanceMode": false,
+    "EnablePullRequestPreview": false,
+    "EnvironmentVariables": [
+     {
+      "Name": "AMPLIFY_BACKEND_APP_ID",
+      "Value": "do7m1qv1apsq6"
+     },
+     {
+      "Name": "USER_BRANCH",
+      "Value": "main"
+     }
+    ],
+    "Stage": "PRODUCTION"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/PortfolioAmplifyMainBranch"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/31RXWvDMAz8LXt3vC2wH9APGIXBSto9D9VRUreOHSR5pRj/95FkKd0e9nQn6cQdUqnLl2f99AAXLkx9Lpw96LQTMGdVIYdIBhVc+DOhKXXaoYlk5fpKIfZq1fj/GxvfEjKrjWcBb3AQ3PM3iN4c99j1DgSzstDpVAU3DmecF7YUGuswK0ZDKNyBhxZJp8mVUNQEe6AWZSEC5tihF3UT/J1kRTXrtAaBAzDeR1sv5yorE1pvJej0wUjbENwguPGZrJz9MfvdyQq63tnmOiZd9OOZlgTeHHMe+HuUPkpWPtSoT/z4VZa6HH5yYmsLil5sh7qa8BvHDjgUsAEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "JarvisStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "VITEAWSCOGNITOUSERPOOLID": {
+   "Description": "Cognito User Pool ID — use as VITE_AWS_COGNITO_USER_POOL_ID in client/.env",
+   "Value": {
+    "Ref": "JarvisUserPool45CBB6EE"
+   }
+  },
+  "VITEAWSCOGNITOCLIENTID": {
+   "Description": "Cognito App Client ID — use as VITE_AWS_COGNITO_CLIENT_ID in client/.env",
+   "Value": {
+    "Ref": "JarvisUserPoolClient03B4E668"
+   }
+  },
+  "RdsEndpoint": {
+   "Description": "RDS MySQL endpoint address",
+   "Value": {
+    "Fn::GetAtt": [
+     "JarvisDbD9CA4EED",
+     "Endpoint.Address"
+    ]
+   }
+  },
+  "RdsSecretArn": {
+   "Description": "ARN of the Secrets Manager secret for RDS master password",
+   "Value": {
+    "Fn::GetAtt": [
+     "JarvisRdsSecret",
+     "Id"
+    ]
+   }
+  }
+ }
+}

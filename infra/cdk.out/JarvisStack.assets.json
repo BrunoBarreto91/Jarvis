@@ -1,0 +1,21 @@
+{
+  "version": "53.0.0",
+  "files": {
+    "fb58b9675cca9ef65112a9baf426c4b86132b73c84e2e9060a2f1c340b91dcff": {
+      "displayName": "JarvisStack Template",
+      "source": {
+        "path": "JarvisStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "733048624030-us-east-1-88818599": {
+          "bucketName": "cdk-hnb659fds-assets-733048624030-us-east-1",
+          "objectKey": "fb58b9675cca9ef65112a9baf426c4b86132b73c84e2e9060a2f1c340b91dcff.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::733048624030:role/cdk-hnb659fds-file-publishing-role-733048624030-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

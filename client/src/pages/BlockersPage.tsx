@@ -26,7 +26,7 @@ export default function BlockersPage() {
             toast.success("Desbloqueado! Movido para A Fazer.");
             // Auto-refresh após ação
             setTimeout(() => loadTasks(), 800);
-        } catch (e) {
+        } catch {
             toast.error("Erro ao desbloquear.");
         }
     };

@@ -10,9 +10,19 @@ build/
 
 # Environment variables
 .env
-.env.local
-.env.production
-.env.staging
+.env.*
+
+# Secrets
+*.pem
+secrets/
+
+# Infra docs with credentials (never expose)
+docs/infra-blueprint.md
+docs/infra-spec.md
+
+# Kiro
+.kiro/cache/
+.kiro/settings/mcp.json
 
 # IDE
 .vscode/
@@ -48,3 +58,16 @@ coverage/
 # Misc
 *.bak
 *.tmp
+
+infra/scan-baseline/
+
+# CDK outputs — contains resource IDs, must not be committed
+infra/cdk-outputs.json
+
+# CDK build artifacts
+infra/dist/
+infra/node_modules/
+
+# Temp files that may contain secrets
+infra/secret-value.json
+infra/secret-temp.json

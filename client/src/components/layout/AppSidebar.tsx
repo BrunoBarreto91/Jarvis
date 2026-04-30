@@ -10,8 +10,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Link, useLocation } from "wouter"
-import { useAuthContext } from "@/_core/context/AuthContext"
+import { NavLink } from "react-router-dom"
+import { useAuth } from "@/_core/hooks/useAuth"
 import { toast } from "sonner"
 
 // Menu items.
@@ -44,12 +44,11 @@ const items = [
 ]
 
 export function AppSidebar() {
-    const [location] = useLocation();
-    const { logout, user } = useAuthContext();
+    const { signOut, user } = useAuth();
 
     const handleLogout = () => {
-        logout();
-        toast.success("Sessão encerrada.");
+        signOut();
+        toast.success("Your session has ended");
     };
 
     return (
@@ -61,11 +60,15 @@ export function AppSidebar() {
                         <SidebarMenu>
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild isActive={location === item.url} tooltip={item.title}>
-                                        <Link href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
+                                    <SidebarMenuButton asChild tooltip={item.title}>
+                                        <NavLink to={item.url} end={item.url === "/"}>
+                                            {({ isActive }) => (
+                                                <>
+                                                    <item.icon className={isActive ? "text-violet-500" : ""} />
+                                                    <span>{item.title}</span>
+                                                </>
+                                            )}
+                                        </NavLink>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -79,7 +82,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton tooltip="Sair" onClick={handleLogout}>
                             <LogOut className="h-4 w-4" />
-                            <span className="text-sm text-slate-600">{user?.email ?? "Sair"}</span>
+                            <span className="text-sm text-slate-600">{user?.username ?? "Sair"}</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -87,4 +90,3 @@ export function AppSidebar() {
         </Sidebar>
     )
 }
-

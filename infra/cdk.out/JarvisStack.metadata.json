@@ -1,0 +1,371 @@
+{
+  "/JarvisStack": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/N8nSubnet": [
+    {
+      "type": "aws:cdk:warning",
+      "data": "No routeTableId was provided to the subnet 'subnet-0fc0ba1fc079f68c3'. Attempting to read its .routeTable.routeTableId will return null/undefined. (More info: https://github.com/aws/aws-cdk/pull/3171) [ack: @aws-cdk/aws-ec2:noSubnetRouteTableId]",
+      "trace": [
+        "Annotations.addMessage (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2399)",
+        "Annotations.addWarningV2 (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:1087)",
+        "new ImportedSubnet2 (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\vpc.js:1:49730)",
+        "new ImportedSubnet2 (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\core\\lib\\prop-injectable.js:1:855)",
+        "Function.fromSubnetAttributes (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\vpc.js:1:31797)",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:61:22)",
+        "Object.<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "Module._compile (node:internal/modules/cjs/loader:1706:14)",
+        "Module.m._compile (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+        "node:internal/modules/cjs/loader:1839:10",
+        "Object.require.extensions.<computed> [as .ts] (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+        "Module.load (node:internal/modules/cjs/loader:1441:32)",
+        "Function._load (node:internal/modules/cjs/loader:1263:12)",
+        "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+        "wrapModuleLoad (node:internal/modules/cjs/loader:237:24)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)",
+        "phase4 (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+        "bootstrap (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+        "main (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+        "Object.<anonymous> (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+        "Module._compile (node:internal/modules/cjs/loader:1706:14)",
+        "Object.<anonymous> (node:internal/modules/cjs/loader:1839:10)",
+        "Module.load (node:internal/modules/cjs/loader:1441:32)",
+        "Function._load (node:internal/modules/cjs/loader:1263:12)",
+        "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+        "wrapModuleLoad (node:internal/modules/cjs/loader:237:24)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)",
+        "node:internal/main/run_main_module:36:49"
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisN8nServer": [
+    {
+      "type": "aws:cdk:warning",
+      "data": "The throughput property is not supported on EC2 instances. Use a Launch Template instead. See https://github.com/aws/aws-cdk/issues/34033 for more information. [ack: @aws-cdk/aws-ec2:throughputNotSupported]",
+      "trace": [
+        "Annotations.addMessage (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:2399)",
+        "Annotations.addWarningV2 (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\core\\lib\\annotations.js:1:1087)",
+        "instanceBlockDeviceMappings (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\private\\ebs-util.js:1:661)",
+        "new Instance2 (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\aws-ec2\\lib\\instance.js:1:10950)",
+        "new Instance2 (D:\\GitHub\\Jarvis\\infra\\node_modules\\aws-cdk-lib\\core\\lib\\prop-injectable.js:1:855)",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:49:25)",
+        "Object.<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "Module._compile (node:internal/modules/cjs/loader:1706:14)",
+        "Module.m._compile (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\index.ts:1618:23)",
+        "node:internal/modules/cjs/loader:1839:10",
+        "Object.require.extensions.<computed> [as .ts] (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\index.ts:1621:12)",
+        "Module.load (node:internal/modules/cjs/loader:1441:32)",
+        "Function._load (node:internal/modules/cjs/loader:1263:12)",
+        "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+        "wrapModuleLoad (node:internal/modules/cjs/loader:237:24)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)",
+        "phase4 (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:649:14)",
+        "bootstrap (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:95:10)",
+        "main (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:55:10)",
+        "Object.<anonymous> (D:\\GitHub\\Jarvis\\infra\\node_modules\\ts-node\\src\\bin.ts:800:3)",
+        "Module._compile (node:internal/modules/cjs/loader:1706:14)",
+        "Object.<anonymous> (node:internal/modules/cjs/loader:1839:10)",
+        "Module.load (node:internal/modules/cjs/loader:1441:32)",
+        "Function._load (node:internal/modules/cjs/loader:1263:12)",
+        "TracingChannel.traceSync (node:diagnostics_channel:328:14)",
+        "wrapModuleLoad (node:internal/modules/cjs/loader:237:24)",
+        "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)",
+        "node:internal/main/run_main_module:36:49"
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisRdsSecret": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisRdsSecret"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:108:23)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisAmplifyApp": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisAmplifyApp"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:208:27)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/PortfolioAmplifyApp": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PortfolioAmplifyApp"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:241:30)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/PortfolioAmplifyMainBranch": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PortfolioAmplifyMainBranch"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:273:33)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/VITE_AWS_COGNITO_USER_POOL_ID": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VITEAWSCOGNITOUSERPOOLID"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:291:5)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/VITE_AWS_COGNITO_CLIENT_ID": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "VITEAWSCOGNITOCLIENTID"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:296:5)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/RdsEndpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RdsEndpoint"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:301:5)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/RdsSecretArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RdsSecretArn"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:306:5)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisN8nSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisN8nSg09D48FB2"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new SecurityGroup2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:25:19)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisRdsSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisRdsSg7C281A02"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new SecurityGroup2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:37:19)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisRdsSg/from JarvisStackJarvisN8nSg2D051939:3306": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisRdsSgfromJarvisStackJarvisN8nSg2D0519393306B0610907"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.<anonymous> in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:43:11)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisN8nServer/InstanceProfile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisN8nServerInstanceProfile942886F1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Instance2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:49:25)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisN8nServer/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisN8nServerA7593D1D"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Instance2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:49:25)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisN8nServer/LaunchTemplate": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisN8nServerLaunchTemplateE9BDA2B7"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals, @cspotcode\\source-map-support...",
+        "(no user code in 9007199254740991 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisDb/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisDbD9CA4EED"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new DatabaseInstance2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:134:25)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisUserPool/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisUserPool45CBB6EE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new UserPool2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:165:22)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisUserPoolClient/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisUserPoolClient03B4E668"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new UserPoolClient2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:188:28)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals, @cspotcode\\source-map-support...",
+        "(no user code in 9007199254740991 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisN8nServer/InstanceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisN8nServerInstanceRoleC3F5FEA7"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Instance2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:49:25)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ],
+  "/JarvisStack/JarvisRdsSecretRef/Attachment/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JarvisRdsSecretRefAttachment4416A3DF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new DatabaseInstance2 in aws-cdk-lib...",
+        "new JarvisStack (D:\\GitHub\\Jarvis\\infra\\lib\\jarvis-stack.ts:134:25)",
+        "<anonymous> (D:\\GitHub\\Jarvis\\infra\\bin\\jarvis.ts:8:1)",
+        "...node internals, ts-node, ts-node, ts-node..."
+      ]
+    }
+  ]
+}

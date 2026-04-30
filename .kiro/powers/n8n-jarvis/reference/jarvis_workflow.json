@@ -1,0 +1,500 @@
+{
+  "name": "jarvis_workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tasks",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "",
+      "name": "Webhook_IngestTask",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "httpMethod": "PATCH",
+        "path": "tasks",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 544],
+      "id": "",
+      "name": "Webhook_UpdateTask",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "path": "tasks",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "responseHeaders": {
+            "entries": [
+              { "name": "Access-Control-Allow-Origin", "value": "*" },
+              { "name": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+              { "name": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 352],
+      "id": "",
+      "name": "Webhook_ListTasks",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "httpMethod": "DELETE",
+        "path": "tasks",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 736],
+      "id": "",
+      "name": "Webhook_DeleteTask",
+      "webhookId": ""
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours" }]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 1024],
+      "id": "",
+      "name": "ScheduleTrigger_Guardian"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-lite-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [176, 144],
+      "id": "",
+      "name": "LM_GeminiFlashLite",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [560, 1168],
+      "id": "",
+      "name": "LM_GeminiFlash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.sessionId || 'default_session' }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [320, 176],
+      "id": "",
+      "name": "Memory_TaskSession"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "jarvis_guardian"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [704, 1184],
+      "id": "",
+      "name": "Memory_GuardianSession"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.description }}",
+        "options": {
+          "systemMessage": "Você é o Jarvis, assistente lógico para gestão cognitiva. Sua função é transformar falas em JSON para o banco de dados.\n\nRegras de Campos:\n\ntitle: Resumo direto da ação. Crie um título curto, direto e acionável (ex: 'Lavar louça'). Nunca peça ao usuário para definir o título.\n\ncontexto: Onde (Trabalho, Casa, Saúde, Pessoal).\n\ntag: Sintoma ou foco (Foco Longo, Urgente, Social, Criativo).\n\ncategoria: Tipo (Tarefa, Ideia, Hábito).\n\nprioridade: (baixa, media, alta).\n\nnivel_energia: (baixa, media, alta).\n\nduracao_estimada_minutos: Inteiro (estimativa lógica de tempo).\n\nnotas: Detalhes do pedido.\n\nRetorne APENAS o JSON puro, sem textos extras."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [224, 0],
+      "id": "",
+      "name": "ClassifyWithGemini_Task"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data[0].title }}",
+        "options": {
+          "systemMessage": "Você é o Jarvis, o Guardião Cognitivo do usuário. Analise a lista de tarefas anexa.\n\nSua missão: Retornar um JSON decidindo se o usuário deve ser interrompido agora.\n\nDiretrizes de Julgamento:\n\nNOTAS (SUPREMO): Procure por comandos como 'Não avise' ou 'Avisar urgente'. Isso anula qualquer outra regra.\n\nEQUILÍBRIO DE ENERGIA: Não cobre tarefas de 'esforço: alto' se o usuário sinalizou 'nivel_energia: baixa'. Nesses casos, sugira algo leve ou silêncio.\n\nCEGUEIRA TEMPORAL: Se o prazo está no passado ou em menos de 1h, a urgência aumenta drasticamente.\n\nCONTEXTO: Se for madrugada ou fim de semana, seja 10x mais criterioso. Só interrompa se for uma 'Ação Crítica' ou pedido expresso.\n\nSaída esperada (Apenas JSON): { \"decisao\": \"SIM\" | \"NAO\", \"motivo\": \"Breve explicação do seu feeling\", \"mensagem\": \"Texto empático e direto para o usuário caso a decisão seja SIM\" }\n\nIMPORTANTE: Sua resposta deve ser exclusivamente um objeto JSON válido. NÃO use blocos de código Markdown (como ```json). NÃO adicione texto explicativo antes ou depois do JSON. Responda apenas o objeto bruto, por exemplo: {\"decisao\": \"SIM\", \"motivo\": \"...\", \"mensagem\": \"...\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [608, 1024],
+      "id": "",
+      "name": "EvaluateGuardian"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE tasks \nSET \n    status = 'done', \n    custo_cognitivo_real = '{{ $json.body.custo_cognitivo_real }}', \n    sentimento_pos_conclusao = '{{ $json.body.sentimento_pos_conclusao }}', \n    duracao_real_minutos = {{ $json.body.duracao_real_minutos }},\n    completadoEm = NOW()\nWHERE id = {{ $json.body.id }};",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [224, 544],
+      "id": "",
+      "name": "WriteToMySQL_UpdateTask",
+      "credentials": {
+        "mySql": {
+          "id": "YOUR_MYSQL_CREDENTIAL_ID",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT *, \n       NOW() as hora_atual, \n       DAYNAME(NOW()) as dia_da_semana \nFROM tasks \nWHERE status = 'todo';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [208, 1024],
+      "id": "",
+      "name": "ReadFromMySQL_PendingTasks",
+      "credentials": {
+        "mySql": {
+          "id": "YOUR_MYSQL_CREDENTIAL_ID",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "table": {
+          "__rl": true,
+          "value": "tasks",
+          "mode": "list",
+          "cachedResultName": "tasks"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            { "column": "userId", "value": "={{ $json.userId }}" },
+            { "column": "title", "value": "={{ $json.title }}" },
+            { "column": "contexto", "value": "={{ $json.contexto }}" },
+            { "column": "tag", "value": "={{ $json.tag }}" },
+            { "column": "categoria", "value": "={{ $json.categoria }}" },
+            { "column": "prioridade", "value": "={{ $json.prioridade }}" },
+            { "column": "nivel_energia", "value": "={{ $json.nivel_energia }}" },
+            { "column": "duracao_estimada_minutos", "value": "={{ $json.duracao_estimada_minutos }}" },
+            { "column": "status", "value": "={{ $json.status }}" },
+            { "column": "notas", "value": "={{ $json.notas }}" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [800, 0],
+      "id": "",
+      "name": "WriteToMySQL_InsertTask",
+      "credentials": {
+        "mySql": {
+          "id": "YOUR_MYSQL_CREDENTIAL_ID",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM tasks ORDER BY criadoEm DESC;"
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 1,
+      "position": [256, 352],
+      "id": "",
+      "name": "ReadFromMySQL_AllTasks",
+      "credentials": {
+        "mySql": {
+          "id": "YOUR_MYSQL_CREDENTIAL_ID",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM tasks WHERE id = {{ $json.body.id }};"
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 1,
+      "position": [256, 736],
+      "id": "",
+      "name": "DeleteFromMySQL_Task",
+      "credentials": {
+        "mySql": {
+          "id": "YOUR_MYSQL_CREDENTIAL_ID",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiText = $input.first().json.output || $input.first().json.text || $input.first().json.response?.generations?.[0]?.[0]?.text;\n\ntry {\n    const jsonMatch = aiText.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n        const data = JSON.parse(jsonMatch[0]);\n        return [{\n            json: {\n                userId: 1,\n                title: data.title || \"Nova Tarefa\",\n                contexto: data.contexto || \"Pessoal\",\n                tag: data.tag || \"Geral\",\n                categoria: data.categoria || \"Tarefa\",\n                prioridade: data.prioridade || \"media\",\n                nivel_energia: data.nivel_energia || \"media\",\n                duracao_estimada_minutos: data.duracao_estimada_minutos || 15,\n                status: \"todo\",\n                notas: data.notas || aiText\n            }\n        }];\n    }\n} catch (e) {\n    return [{ json: { error: \"JSON mapping error\", details: e.message } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [576, 0],
+      "id": "",
+      "name": "ParseTaskJSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawOutput = $input.item.json.output;\nreturn JSON.parse(rawOutput);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [928, 1024],
+      "id": "",
+      "name": "ParseNotificationJSON"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "title, prazo, prioridade, nivel_energia, notas, hora_atual, data_inicio_foco, dia_da_semana, completadoEm, esforco, custo_cognitivo_real, sentimento_pos_conclusao",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [416, 1024],
+      "id": "",
+      "name": "AggregateTaskData"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "",
+              "leftValue": "={{ $json.decisao }}",
+              "rightValue": "SIM",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1120, 1024],
+      "id": "",
+      "name": "If_ShouldNotify"
+    },
+    {
+      "parameters": {
+        "jsCode": "// TODO: implement notification dispatch (push, email, or webhook)\n// Input: $json.mensagem (guardian message), $json.motivo (reason)\nfor (const item of $input.all()) {\n  item.json.dispatched = false;\n}\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1328, 976],
+      "id": "",
+      "name": "Notify_Placeholder"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\": \"ok\", \"data\": { \"message\": \"Task created successfully\" }, \"error\": null, \"trace_id\": \"\"}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1008, 0],
+      "id": "",
+      "name": "RespondToWebhook_TaskCreated"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"ok\", \"data\": { \"message\": \"Task updated successfully\" }, \"error\": null, \"trace_id\": \"\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [448, 544],
+      "id": "",
+      "name": "RespondToWebhook_TaskUpdated"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [512, 352],
+      "id": "",
+      "name": "RespondToWebhook_TaskList"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"status\": \"ok\", \"data\": null, \"error\": null, \"trace_id\": \"\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [512, 736],
+      "id": "",
+      "name": "RespondToWebhook_TaskDeleted"
+    },
+    {
+      "parameters": {
+        "content": "[Jarvis Task Flow]",
+        "height": 944,
+        "width": 1520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-48, -48],
+      "typeVersion": 1,
+      "id": "",
+      "name": "[Jarvis Task Flow]"
+    },
+    {
+      "parameters": {
+        "content": "[Jarvis Notification Flow]",
+        "height": 368,
+        "width": 1568,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-48, 960],
+      "typeVersion": 1,
+      "id": "",
+      "name": "[Jarvis Notification Flow]"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook_IngestTask": {
+      "main": [[{ "node": "ClassifyWithGemini_Task", "type": "main", "index": 0 }]]
+    },
+    "Webhook_UpdateTask": {
+      "main": [[{ "node": "WriteToMySQL_UpdateTask", "type": "main", "index": 0 }]]
+    },
+    "Webhook_ListTasks": {
+      "main": [[{ "node": "ReadFromMySQL_AllTasks", "type": "main", "index": 0 }]]
+    },
+    "Webhook_DeleteTask": {
+      "main": [[{ "node": "DeleteFromMySQL_Task", "type": "main", "index": 0 }]]
+    },
+    "ScheduleTrigger_Guardian": {
+      "main": [[{ "node": "ReadFromMySQL_PendingTasks", "type": "main", "index": 0 }]]
+    },
+    "LM_GeminiFlashLite": {
+      "ai_languageModel": [[{ "node": "ClassifyWithGemini_Task", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "LM_GeminiFlash": {
+      "ai_languageModel": [[{ "node": "EvaluateGuardian", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Memory_TaskSession": {
+      "ai_memory": [[{ "node": "ClassifyWithGemini_Task", "type": "ai_memory", "index": 0 }]]
+    },
+    "Memory_GuardianSession": {
+      "ai_memory": [[{ "node": "EvaluateGuardian", "type": "ai_memory", "index": 0 }]]
+    },
+    "ClassifyWithGemini_Task": {
+      "main": [[{ "node": "ParseTaskJSON", "type": "main", "index": 0 }]]
+    },
+    "ParseTaskJSON": {
+      "main": [[{ "node": "WriteToMySQL_InsertTask", "type": "main", "index": 0 }]]
+    },
+    "WriteToMySQL_InsertTask": {
+      "main": [[{ "node": "RespondToWebhook_TaskCreated", "type": "main", "index": 0 }]]
+    },
+    "WriteToMySQL_UpdateTask": {
+      "main": [[{ "node": "RespondToWebhook_TaskUpdated", "type": "main", "index": 0 }]]
+    },
+    "ReadFromMySQL_AllTasks": {
+      "main": [[{ "node": "RespondToWebhook_TaskList", "type": "main", "index": 0 }]]
+    },
+    "DeleteFromMySQL_Task": {
+      "main": [[{ "node": "RespondToWebhook_TaskDeleted", "type": "main", "index": 0 }]]
+    },
+    "ReadFromMySQL_PendingTasks": {
+      "main": [[{ "node": "AggregateTaskData", "type": "main", "index": 0 }]]
+    },
+    "AggregateTaskData": {
+      "main": [[{ "node": "EvaluateGuardian", "type": "main", "index": 0 }]]
+    },
+    "EvaluateGuardian": {
+      "main": [[{ "node": "ParseNotificationJSON", "type": "main", "index": 0 }]]
+    },
+    "ParseNotificationJSON": {
+      "main": [[{ "node": "If_ShouldNotify", "type": "main", "index": 0 }]]
+    },
+    "If_ShouldNotify": {
+      "main": [[{ "node": "Notify_Placeholder", "type": "main", "index": 0 }]]
+    },
+    "RespondToWebhook_TaskCreated": {
+      "main": [[]]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}

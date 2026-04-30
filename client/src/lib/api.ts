@@ -1,23 +1,11 @@
-import {
-    CognitoUserPool,
-    CognitoUserSession,
-} from "amazon-cognito-identity-js";
-
-const userPool = new CognitoUserPool({
-    UserPoolId: import.meta.env.VITE_AWS_COGNITO_USER_POOL_ID as string,
-    ClientId: import.meta.env.VITE_AWS_COGNITO_CLIENT_ID as string,
-});
+import { fetchAuthSession } from "aws-amplify/auth";
 
 /** Retrieves the JWT ID Token from the active Cognito session. */
 async function getIdToken(): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const user = userPool.getCurrentUser();
-        if (!user) { reject(new Error("Sem sessão ativa")); return; }
-        user.getSession((err: Error | null, session: CognitoUserSession | null) => {
-            if (err || !session?.isValid()) { reject(err ?? new Error("Sessão inválida")); return; }
-            resolve(session.getIdToken().getJwtToken());
-        });
-    });
+    const session = await fetchAuthSession();
+    const token = session.tokens?.idToken?.toString();
+    if (!token) throw new Error("No active session");
+    return token;
 }
 
 /** Returns base headers with injected Authorization token. */
@@ -51,7 +39,7 @@ interface ApiTask {
     context?: string;
     criadoEm?: string;
     createdAt?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | null | undefined;
 }
 
 /** Maps raw API responses (PT-BR keys) to the internal Task type. */

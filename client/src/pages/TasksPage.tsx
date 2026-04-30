@@ -35,7 +35,7 @@ export default function TasksPage() {
             toast.success("Tarefa excluída.");
             // Auto-refresh após ação (baixa carga cognitiva)
             setTimeout(() => loadTasks(), 800);
-        } catch (e) {
+        } catch {
             toast.error("Erro ao excluir.");
         }
     };
@@ -46,7 +46,7 @@ export default function TasksPage() {
             toast.success("Tarefa concluída.");
             // Auto-refresh após ação (baixa carga cognitiva)
             setTimeout(() => loadTasks(), 800);
-        } catch (e) {
+        } catch {
             toast.error("Erro ao concluir.");
         }
     };

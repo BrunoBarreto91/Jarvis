@@ -1,0 +1,14 @@
+{
+  "name": "jarvis-editorial",
+  "description": "Editorial guardrails for public-facing artifacts of Jarvis (README, docs, public site).",
+  "version": "1.0.0",
+  "activation": {
+    "type": "fileMatch",
+    "patterns": ["README.md", "docs/**/*.md", "client/public/**/*.html"]
+  },
+  "steering": [
+    "steering/editorial-rules.md",
+    "steering/sanitization-checklist.md",
+    "steering/tone-examples.md"
+  ]
+}
