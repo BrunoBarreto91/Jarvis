@@ -60,3 +60,14 @@ coverage/
 *.tmp
 
 infra/scan-baseline/
+
+# CDK outputs — contains resource IDs, must not be committed
+infra/cdk-outputs.json
+
+# CDK build artifacts
+infra/dist/
+infra/node_modules/
+
+# Temp files that may contain secrets
+infra/secret-value.json
+infra/secret-temp.json

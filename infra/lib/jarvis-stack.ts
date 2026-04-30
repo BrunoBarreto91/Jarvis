@@ -44,54 +44,52 @@ export class JarvisStack extends cdk.Stack {
     rdsSg.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 3. EC2 Instance — jarvis-n8n-server (imported, not created)
+    // 3. EC2 Instance — jarvis-n8n-server (L1 CfnInstance — imported, not created)
+    //    Using CfnInstance (L1) instead of ec2.Instance (L2) because:
+    //    - L2 auto-generates IAM Role + InstanceProfile that don't exist on the
+    //      live instance (it was provisioned imperatively without CDK)
+    //    - L2 auto-generates a LaunchTemplate for requireImdsv2 which also
+    //      doesn't exist in the live account
+    //    - Both cause "Unresolved resource dependencies" on cdk import
+    //    - CfnInstance maps 1:1 to the live CloudFormation resource with no
+    //      auto-generated dependencies. See ADR-007.
     // ─────────────────────────────────────────────────────────────────────────
-    const n8nInstance = new ec2.Instance(this, 'JarvisN8nServer', {
-      vpc,
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
-        ec2.InstanceSize.MICRO,
-      ),
-      machineImage: ec2.MachineImage.genericLinux({
-        'us-east-1': 'ami-0c1e21d82fe9c9336',
-      }),
+    const cfnInstance = new ec2.CfnInstance(this, 'JarvisN8nServer', {
+      instanceType: 't3.micro',
+      imageId: 'ami-0c1e21d82fe9c9336',
       availabilityZone: 'us-east-1a',
-      vpcSubnets: {
-        subnets: [
-          ec2.Subnet.fromSubnetAttributes(this, 'N8nSubnet', {
-            subnetId: 'subnet-0fc0ba1fc079f68c3',
-            availabilityZone: 'us-east-1a',
-          }),
-        ],
-      },
-      securityGroup: n8nSg,
-      // jarvis-key is NOT managed by CDK — set via L1 override to avoid key pair lookup
-      blockDevices: [
+      subnetId: 'subnet-0fc0ba1fc079f68c3',
+      securityGroupIds: [n8nSg.securityGroupId],
+      keyName: 'jarvis-key',
+      blockDeviceMappings: [
         {
           deviceName: '/dev/xvda',
-          volume: ec2.BlockDeviceVolume.ebs(30, {
-            volumeType: ec2.EbsDeviceVolumeType.GP3,
+          ebs: {
+            volumeSize: 30,
+            volumeType: 'gp3',
             iops: 3000,
-            throughput: 125,
             deleteOnTermination: true,
             encrypted: false,
-          }),
+          },
         },
       ],
-      requireImdsv2: true,
+      metadataOptions: {
+        httpTokens: 'required',
+        httpPutResponseHopLimit: 2,
+        httpEndpoint: 'enabled',
+      },
       propagateTagsToVolumeOnCreation: false,
+      tags: [
+        { key: 'Name',    value: 'jarvis-n8n-server' },
+        { key: 'Project', value: 'Jarvis' },
+      ],
     });
-    // Set HttpPutResponseHopLimit: 2 via L1 escape hatch — cannot combine with requireImdsv2 in props
-    const cfnInstance = n8nInstance.node.defaultChild as ec2.CfnInstance;
-    cfnInstance.addPropertyOverride('MetadataOptions.HttpPutResponseHopLimit', 2);
-    // Set KeyName via L1 — avoids CDK key pair lookup, key is managed outside CDK
-    cfnInstance.addPropertyOverride('KeyName', 'jarvis-key');
-    cdk.Tags.of(n8nInstance).add('Name', 'jarvis-n8n-server');
-    cdk.Tags.of(n8nInstance).add('Project', 'Jarvis');
-    // RETAIN: protects against `cdk destroy`. Does NOT prevent manual termination.
-    // If the instance is manually terminated, the EBS volume is also deleted
-    // (deleteOnTermination: true). See ADR-002.
-    n8nInstance.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+    cfnInstance.cfnOptions.deletionPolicy = cdk.CfnDeletionPolicy.RETAIN;
+    cfnInstance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.RETAIN;
+    // Note: Throughput on BlockDeviceMappings is not supported by AWS::EC2::Instance
+    // (only supported on AWS::EC2::LaunchTemplate). The live instance has Throughput: 125
+    // but CloudFormation cannot track this property on a CfnInstance resource.
+    // The actual throughput is preserved on the live EBS volume — CDK simply won't manage it.
 
     // ─────────────────────────────────────────────────────────────────────────
     // 4. RDS Secrets Manager Secret
@@ -201,7 +199,7 @@ export class JarvisStack extends cdk.Stack {
     });
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 8. Amplify — Jarvis app (L1 construct, imported)
+    // 9. Amplify — Jarvis app (L1 construct, imported)
     //    CacheConfig applied via addPropertyOverride — the CDK CloudFormation
     //    catalog may lag on AMPLIFY_MANAGED_NO_COOKIES. See ADR-006.
     // ─────────────────────────────────────────────────────────────────────────
@@ -234,55 +232,6 @@ export class JarvisStack extends cdk.Stack {
     // Do NOT set cacheConfig in constructor props — use addPropertyOverride.
     amplifyJarvis.addPropertyOverride('CacheConfig.Type', 'AMPLIFY_MANAGED_NO_COOKIES');
     amplifyJarvis.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // 9. Amplify — Portfolio app (L1 construct, imported)
-    // ─────────────────────────────────────────────────────────────────────────
-    const amplifyPortfolio = new amplify.CfnApp(this, 'PortfolioAmplifyApp', {
-      name: 'Bruno_Barreto-portfolio',
-      platform: 'WEB',
-      repository: 'https://github.com/brunobarreto91/pentecost-site',
-      iamServiceRole: 'arn:aws:iam::733048624030:role/amplifyconsole-backend-role',
-      enableBranchAutoDeletion: false,
-      basicAuthConfig: { enableBasicAuth: false },
-      customRules: [
-        {
-          source: '/<*>',
-          target: '/index.html',
-          status: '404-200',
-        },
-      ],
-      buildSpec: [
-        'version: 1',
-        'frontend:',
-        '  phases:',
-        '    build:',
-        '      commands: []',
-        '  artifacts:',
-        '    baseDirectory: /',
-        '    files:',
-        "      - '**/*'",
-        '  cache:',
-        '    paths: []',
-      ].join('\n'),
-    });
-    amplifyPortfolio.addPropertyOverride('CacheConfig.Type', 'AMPLIFY_MANAGED_NO_COOKIES');
-    amplifyPortfolio.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
-
-    // Portfolio main branch
-    const portfolioMainBranch = new amplify.CfnBranch(this, 'PortfolioAmplifyMainBranch', {
-      appId: amplifyPortfolio.attrAppId,
-      branchName: 'main',
-      stage: 'PRODUCTION',
-      enableAutoBuild: true,
-      enablePerformanceMode: false,
-      enablePullRequestPreview: false,
-      environmentVariables: [
-        { name: 'AMPLIFY_BACKEND_APP_ID', value: 'do7m1qv1apsq6' },
-        { name: 'USER_BRANCH',            value: 'main' },
-      ],
-    });
-    portfolioMainBranch.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
 
     // ─────────────────────────────────────────────────────────────────────────
     // 10. CloudFormation Outputs
